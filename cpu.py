@@ -37,7 +37,8 @@ class CPU:
         self.isr = 6
         self.spr = 7
 
-        self.reg[7] = 0xF4
+        # Start address of stack pointer
+        self.reg[self.spr] = 0xF4
 
         # Interrupt Vector Table
         self.ivt = [0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF]
@@ -125,11 +126,11 @@ class CPU:
         }
 
     @staticmethod
-    def _set_nth_bit(b, n):
+    def set_nth_bit(b, n):
         return b | 1 << n
 
     @staticmethod
-    def _unset_nth_bit(b, n):
+    def unset_nth_bit(b, n):
         return b & ~(1 << n)
 
     @property
@@ -216,7 +217,7 @@ class CPU:
                 self.interrupts_enabled = False
 
                 # Clear interrupt bit in IS
-                self.reg[self.isr] = self._unset_nth_bit(self.reg[self.isr], i - 1)
+                self.reg[self.isr] = self.unset_nth_bit(self.reg[self.isr], i - 1)
 
                 # Push processor state on stack
                 # PC and flag register
@@ -327,7 +328,7 @@ class CPU:
             timer_check = time()
             if timer_check - timer_start > 1:
                 # INT
-                self.reg[self.isr] = self._set_nth_bit(self.reg[self.isr], 0)
+                self.reg[self.isr] = self.set_nth_bit(self.reg[self.isr], 0)
                 # Reset timer
                 timer_start = time()
 
@@ -457,7 +458,7 @@ class CPU:
         Issue interrupt number stored in register r
         Sets nth_bit in register IS
         """
-        self.reg[self.isr] = self._set_nth_bit(self.reg[r], 1)
+        self.reg[self.isr] = self.set_nth_bit(self.reg[r], 1)
 
     def _IRET(self):
         """
