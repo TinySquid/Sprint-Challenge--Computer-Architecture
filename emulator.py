@@ -28,25 +28,25 @@ if __name__ == "__main__":
         # Is file valid
         if path.exists(input_file):
             # Create instance
-            emulator = CPU()
+            ls8 = CPU()
 
             # Initialize keyboard
-            keyboard = Keyboard(emulator)
+            keyboard = Keyboard(ls8)
 
             # Load program
-            emulator.load(input_file)
+            ls8.load(input_file)
 
             # Connect keyboard (starts polling thread)
             keyboard.connect()
 
             # Run without debug trace mode
             if args_len == 2:
-                emulator.run()
+                ls8.run()
 
             # Run with debug trace mode
             elif args_len == 3:
                 if args[2] == "-d":
-                    emulator.run(trace_cycle=True)
+                    ls8.run(trace_cycle=True)
                 else:
                     print_usage("Invalid flag set")
 

@@ -11,9 +11,11 @@ from time import sleep
 
 
 class Keyboard:
-    def __init__(self, emulator):
-        # Get access to emulator as a 'peripheral'
-        self._emulator = emulator
+    def __init__(self, ls8):
+        # Get access to ls8 as a 'peripheral'
+        self.ls8 = ls8
+        # Interrupt bit of this device
+        self.interrupt_bit = 1
         # Create keyboard polling thread
         self._keyboard_thread = threading.Thread(target=self._poll)
         # Making thread a daemon will allow for auto cleanup on main program exit
@@ -28,12 +30,10 @@ class Keyboard:
         while True:
             char = sys.stdin.read(1)  # Read one byte (char)
             if char:
-                # Set char in memory
-                self._emulator.ram[0xF4] = ord(char)
+                # Set char in memory as an int byte
+                self.ls8.ram[0xF4] = ord(char)
                 # Raise keyboard interrupt
-                self._emulator.reg[self._emulator.isr] = self._emulator._set_nth_bit(
-                    self._emulator.reg[self._emulator.isr], 1
-                )
+                self.ls8.raise_interrupt(self.interrupt_bit)
 
             # Sleep 50 ms to keep cpu usage down
             # Technically this makes it poll the keyboard at 20hz

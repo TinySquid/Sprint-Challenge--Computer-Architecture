@@ -45,6 +45,9 @@ class CPU:
 
         self.interrupts_enabled = True
 
+        # What bit the timer uses for its interrupt
+        self.timer_interrupt_bit = 0
+
         # All non-alu instructions understood by the CPU
         self.instructions = {
             # NOP
@@ -140,6 +143,12 @@ class CPU:
     @property
     def _operand_b(self):
         return self.ram[self.pc + 2]
+
+    def raise_interrupt(self, i):
+        """
+        Called externally by a peripheral to raise an interrupt within CPU
+        """
+        self.reg[self.isr] = self.set_nth_bit(self.reg[self.isr], i)
 
     def load(self, input_file):
         """Loads a program from a file into memory."""
@@ -328,7 +337,7 @@ class CPU:
             timer_check = time()
             if timer_check - timer_start > 1:
                 # INT
-                self.reg[self.isr] = self.set_nth_bit(self.reg[self.isr], 0)
+                self.raise_interrupt(self.timer_interrupt_bit)
                 # Reset timer
                 timer_start = time()
 
