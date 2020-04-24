@@ -94,6 +94,8 @@ class CPU:
         self.alu_instructions = {
             # ADD
             0xA0: lambda: self._ALU_ADD(self._operand_a, self._operand_b),
+            # ADDi
+            0xA6: lambda: self._ALU_ADDi(self._operand_a, self._operand_b),
             # SUB
             0xA1: lambda: self._ALU_SUB(self._operand_a, self._operand_b),
             # MUL
@@ -550,6 +552,12 @@ class CPU:
         Adds registerA with registerB, stores result in registerA
         """
         self.reg[ra] = (self.reg[ra] + self.reg[rb]) & 0b11111111
+
+    def _ALU_ADDi(self, r, i):
+        """
+        Adds register r with immediate i, stores result in register r
+        """
+        self.reg[r] = (self.reg[r] + i) & 0b11111111
 
     def _ALU_SUB(self, ra, rb):
         """
